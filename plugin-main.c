@@ -140,27 +140,25 @@ const char *shader_filter_texture_file_filter = "Textures (*.bmp *.tga *.png *.j
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE("obs-shaderfilter", "en-US")
 
-bool obs_module_load(void)
-{
-	blog(LOG_INFO, "[obs-shaderfilter] loaded version %s", PROJECT_VERSION);
-	obs_register_source(&shader_filter);
-	obs_register_source(&shader_transition);
+bool obs_module_load(void) {
+  blog(LOG_INFO, "[obs-shaderfilter] loaded version %s", PROJECT_VERSION);
+  obs_register_source(&shader_filter);
+  obs_register_source(&shader_transition);
 
-	return true;
+  return true;
 }
 
 void obs_module_unload(void) {}
 
-void obs_module_post_load(void)
-{
-	if (obs_get_module("move-transition") == NULL)
-		return;
-	proc_handler_t *ph = obs_get_proc_handler();
-	struct calldata cd;
-	calldata_init(&cd);
-	calldata_set_string(&cd, "filter_id", shader_filter.id);
-	if (proc_handler_call(ph, "move_get_transition_filter_function", &cd)) {
-		move_get_transition_filter = calldata_ptr(&cd, "callback");
-	}
-	calldata_free(&cd);
+void obs_module_post_load(void) {
+  if (obs_get_module("move-transition") == NULL)
+    return;
+  proc_handler_t *ph = obs_get_proc_handler();
+  struct calldata cd;
+  calldata_init(&cd);
+  calldata_set_string(&cd, "filter_id", shader_filter.id);
+  if (proc_handler_call(ph, "move_get_transition_filter_function", &cd)) {
+    move_get_transition_filter = calldata_ptr(&cd, "callback");
+  }
+  calldata_free(&cd);
 }
