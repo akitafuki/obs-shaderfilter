@@ -148,7 +148,7 @@ jobs:
         run: |
           sudo add-apt-repository -y ppa:obsproject/obs-studio
           sudo apt-get update
-          sudo apt-get install -y libobs-dev libobs0 cmake ninja-build build-essential
+          sudo apt-get install -y libobs-dev libobs0 qt6-base-dev cmake ninja-build build-essential
 
       - name: Configure CMake
         run: |
@@ -177,7 +177,7 @@ jobs:
 
   windows-build:
     name: 'Windows Build'
-    runs-on: [windows-latest]
+    runs-on: windows-2022
     strategy:
       fail-fast: true
       matrix:
@@ -192,6 +192,10 @@ jobs:
       CMAKE_SYSTEM_VERSION: "10.0.22621.0"
       WINDOWS_DEPS_VERSION: '2024-01-18'
     steps:
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.target }}
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2
       - name: Checkout obs
@@ -206,7 +210,7 @@ jobs:
           path: plugins/${{ env.PLUGIN_NAME}}
       - name: Add plugin to obs cmake
         shell: cmd
-        run: echo add_subdirectory(${{ env.PLUGIN_NAME }}) > plugins/CMakeLists.txt
+        run: echo add_subdirectory(${{ env.PLUGIN_NAME }}) >> plugins/CMakeLists.txt
       - name: Fetch Git Tags
         run: git fetch --prune --tags --unshallow
       - name: 'Install prerequisite: QT'
@@ -223,7 +227,7 @@ jobs:
           mkdir ./installer
           mkdir ./installer/media
           mkdir ./build
-          cmake -S . -B "${{ github.workspace }}/build" -G"${{ env.CMAKE_GENERATOR }}" -DCMAKE_PREFIX_PATH:PATH="${{ github.workspace }}/cmbuild/deps" -A"${{ matrix.cmake_build }}" -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" -DBUILD_BROWSER=false -DBUILD_VST=false -DBUILD_VIRTUALCAM=false -DBUILD_CAPTIONS=false -DCOMPILE_D3D12_HOOK=false -DENABLE_SCRIPTING=false -DDepsPath="${{ github.workspace }}/cmbuild/deps" -DDepsPath${{ matrix.deps_ext }}="${{ github.workspace }}/cmbuild/deps" -DQTDIR="${{ github.workspace }}/cmbuild/deps/qt6" -DCOPIED_DEPENDENCIES=FALSE -DCOPY_DEPENDENCIES=TRUE -DENABLE_PLUGINS=TRUE -DDISABLE_PLUGINS=FALSE -DENABLE_BROWSER=FALSE -DENABLE_WEBSOCKET=FALSE
+          cmake -S . -B "${{ github.workspace }}/build" -G "${{ env.CMAKE_GENERATOR }}" -A "${{ matrix.cmake_build }}" -DCMAKE_PREFIX_PATH:PATH="${{ github.workspace }}/cmbuild/deps" -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" -DBUILD_BROWSER=false -DBUILD_VST=false -DBUILD_VIRTUALCAM=false -DBUILD_CAPTIONS=false -DCOMPILE_D3D12_HOOK=false -DENABLE_SCRIPTING=false -DDepsPath="${{ github.workspace }}/cmbuild/deps" -DDepsPath${{ matrix.deps_ext }}="${{ github.workspace }}/cmbuild/deps" -DQTDIR="${{ github.workspace }}/cmbuild/deps/qt6" -DCOPIED_DEPENDENCIES=FALSE -DCOPY_DEPENDENCIES=TRUE -DENABLE_PLUGINS=TRUE -DDISABLE_PLUGINS=FALSE -DENABLE_BROWSER=FALSE -DENABLE_WEBSOCKET=FALSE
       - name: 'Build'
         run: msbuild /m /p:Configuration=RelWithDebInfo .\build\obs-studio.sln
       - name: Package
@@ -250,7 +254,7 @@ jobs:
           path: installer/*
   windows-package:
     name: 'Windows Package'
-    runs-on: [windows-latest]
+    runs-on: windows-2022
     needs: [windows-build]
     steps:
       - name: Init

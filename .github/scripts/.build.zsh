@@ -61,7 +61,7 @@ build() {
   local -r -a _valid_configs=(Debug RelWithDebInfo Release MinSizeRel)
   if [[ ${host_os} == 'macos' ]] {
     local -r -a _valid_generators=(Xcode Ninja 'Unix Makefiles')
-    local generator="${${CI:+Ninja}:-Xcode}"
+    local generator='Xcode'
   } else {
     local -r -a _valid_generators=(Ninja 'Unix Makefiles')
     local generator='Ninja'

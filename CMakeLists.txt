@@ -28,7 +28,12 @@ target_sources(${PROJECT_NAME} PRIVATE
 	version.h)
 	
 if(BUILD_OUT_OF_TREE)
-  find_package(libobs REQUIRED)
+  find_package(libobs QUIET)
+  if(NOT TARGET OBS::libobs AND NOT libobs_FOUND)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(LIBOBS REQUIRED IMPORTED_TARGET libobs)
+    add_library(OBS::libobs ALIAS PkgConfig::LIBOBS)
+  endif()
   include(cmake/ObsPluginHelpers.cmake)
 endif()
 
