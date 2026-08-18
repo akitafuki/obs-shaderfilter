@@ -267,6 +267,8 @@ jobs:
     runs-on: windows-2022
     needs: [windows-build]
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Init
         if: success()
         run: |
@@ -286,6 +288,15 @@ jobs:
         with:
           name: 'installer-files'
           path: .
+      - name: Prepare installer files
+        shell: pwsh
+        run: |
+          if (-not (Test-Path ".\installer.iss")) {
+            $found = Get-ChildItem -Path . -Filter "installer.iss" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($found) {
+              Copy-Item $found.FullName -Destination ".\installer.iss" -Force
+            }
+          }
       - name: Publish zip
         if: success()
         uses: actions/upload-artifact@v4.3.1

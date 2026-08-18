@@ -191,10 +191,12 @@ Usage: %B${functrace[1]%:*}%b <option> [<options>]
     log_info "Configuring ${product_name}..."
 
     local _plugin_deps="${project_root:h}/obs-build-dependencies/plugin-deps-${OBS_DEPS_VERSION}-qt${QT_VERSION}-${target##*-}"
+    local _obs_build_dir="${project_root:h}/obs-studio/plugin_build_${target##*-}"
     local -a cmake_args=(
       -DCMAKE_BUILD_TYPE=${BUILD_CONFIG:-RelWithDebInfo}
       -DQT_VERSION=${QT_VERSION}
-      -DCMAKE_PREFIX_PATH="${_plugin_deps}"
+      -DCMAKE_PREFIX_PATH="${_plugin_deps};${_obs_build_dir};${_obs_build_dir}/libobs"
+      -Dlibobs_DIR="${_obs_build_dir}/libobs"
     )
 
     if (( _loglevel == 0 )) cmake_args+=(-Wno_deprecated -Wno-dev --log-level=ERROR)
