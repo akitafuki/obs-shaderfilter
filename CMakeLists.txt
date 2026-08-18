@@ -62,6 +62,13 @@ endif()
 target_link_libraries(${PROJECT_NAME}
 		OBS::libobs)
 
+target_include_directories(${PROJECT_NAME} PRIVATE
+		${CMAKE_CURRENT_SOURCE_DIR}
+		${LIBOBS_INCLUDE_DIRS}
+		${LIBOBS_INCLUDEDIR}
+		/usr/include/obs
+		/usr/local/include/obs)
+
 if(UNIX AND NOT APPLE)
     set_target_properties(${PROJECT_NAME} PROPERTIES
         BUILD_WITH_INSTALL_RPATH TRUE

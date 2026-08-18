@@ -60,6 +60,11 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
+      - name: Select Xcode version
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.4'
+
       - name: Setup Environment
         id: setup
         working-directory: ${{ github.workspace }}/plugin
@@ -190,7 +195,7 @@ jobs:
       QT_VERSION: '6.6.3'
       CMAKE_GENERATOR: "Visual Studio 17 2022"
       CMAKE_SYSTEM_VERSION: "10.0.22621.0"
-      WINDOWS_DEPS_VERSION: '2024-01-18'
+      WINDOWS_DEPS_VERSION: '2024-02-20'
     steps:
       - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
