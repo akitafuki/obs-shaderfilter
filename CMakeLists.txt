@@ -18,7 +18,13 @@ add_library(${PROJECT_NAME} MODULE)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/version.h)
 
 target_sources(${PROJECT_NAME} PRIVATE
-	obs-shaderfilter.c
+	obs-shaderfilter.h
+	plugin-main.c
+	shader-loader.c
+	shader-convert.c
+	shader-params.c
+	shader-filter.c
+	shader-transition.c
 	version.h)
 	
 if(BUILD_OUT_OF_TREE)
@@ -50,6 +56,13 @@ endif()
 
 target_link_libraries(${PROJECT_NAME}
 		OBS::libobs)
+
+if(UNIX AND NOT APPLE)
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        BUILD_WITH_INSTALL_RPATH TRUE
+        INSTALL_RPATH "$ORIGIN;/app/lib;/usr/lib"
+    )
+endif()
 
 if(BUILD_OUT_OF_TREE)
     if(NOT LIB_OUT_DIR)

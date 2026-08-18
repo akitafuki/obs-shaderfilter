@@ -1,7 +1,5 @@
 // Audio shader example showing the difference between audio_peak and audio_magnitude.
 // Left half uses audio_peak (red), right half uses audio_magnitude (blue).
-uniform float audio_peak;
-uniform float audio_magnitude;
 
 uniform float intensity <
   string label = "Audio intensity";

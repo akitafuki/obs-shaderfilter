@@ -1,10 +1,10 @@
 {
     "dependencies": {
         "obs-studio": {
-            "version": "28.0.0-beta1",
+            "version": "30.2.3",
             "repository": "https://github.com/obsproject/obs-studio.git",
             "branch": "master",
-            "hash": "43a49dca47344a5170159ef99b86b97f90d4e4ad"
+            "hash": "30.2.3"
         },
         "prebuilt": {
             "version": "2022-08-02",
@@ -54,7 +54,7 @@
     "platformConfig": {
         "macos-x86_64": {
             "qtVersion": 6,
-            "deploymentTarget": "10.15"
+            "deploymentTarget": "11.0"
         },
         "macos-arm64": {
             "qtVersion": 6,
@@ -62,17 +62,12 @@
         },
         "macos-universal": {
             "qtVersion": 6,
-            "deploymentTarget": "10.15"
+            "deploymentTarget": "11.0"
         },
         "windows-x64": {
             "qtVersion": 6,
             "visualStudio": "Visual Studio 17 2022",
-            "platformSDK": "10.0.20348.0"
-        },
-        "windows-x86": {
-            "qtVersion": 6,
-            "visualStudio": "Visual Studio 17 2022",
-            "platformSDK": "10.0.20348.0"
+            "platformSDK": "10.0.22621.0"
         },
         "linux-x86_64": {
             "qtVersion": 6
