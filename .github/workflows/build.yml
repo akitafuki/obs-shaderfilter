@@ -231,7 +231,7 @@ jobs:
           mkdir ./installer
           mkdir ./installer/media
           mkdir ./build
-          cmake -S . -B "${{ github.workspace }}/build" -G "${{ env.CMAKE_GENERATOR }}" -A "${{ matrix.cmake_build }}" -DCMAKE_PREFIX_PATH:PATH="${{ github.workspace }}/cmbuild/deps" -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" -DENABLE_UI=FALSE -DENABLE_AJA=FALSE -DENABLE_DECKLINK=FALSE -DENABLE_WEBSOCKET=FALSE -DENABLE_BROWSER=FALSE -DENABLE_SCRIPTING=FALSE -DENABLE_VLC=FALSE -DENABLE_NEWTEK_NDI=FALSE -DENABLE_PLUGINS=ON -DDepsPath="${{ github.workspace }}/cmbuild/deps" -DDepsPath${{ matrix.deps_ext }}="${{ github.workspace }}/cmbuild/deps" -DQTDIR="${{ github.workspace }}/cmbuild/deps/qt6" -DCOPIED_DEPENDENCIES=FALSE -DCOPY_DEPENDENCIES=TRUE
+          cmake -S . -B "${{ github.workspace }}/build" -G "${{ env.CMAKE_GENERATOR }}" -A "${{ matrix.cmake_build }}" -DCMAKE_PREFIX_PATH:PATH="${{ github.workspace }}/cmbuild/deps" -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" -DBUILD_BROWSER=OFF -DBUILD_VST=OFF -DBUILD_VIRTUALCAM=OFF -DBUILD_CAPTIONS=OFF -DCOMPILE_D3D12_HOOK=OFF -DENABLE_SCRIPTING=OFF -DENABLE_WEBSOCKET=OFF -DENABLE_AJA=OFF -DENABLE_DECKLINK=OFF -DENABLE_VLC=OFF -DENABLE_PLUGINS=ON -DDISABLE_PLUGINS=OFF -DDepsPath="${{ github.workspace }}/cmbuild/deps" -DDepsPath${{ matrix.deps_ext }}="${{ github.workspace }}/cmbuild/deps" -DQTDIR="${{ github.workspace }}/cmbuild/deps/qt6"
       - name: 'Build'
         run: msbuild /m /p:Configuration=RelWithDebInfo .\build\obs-studio.sln
       - name: Package
