@@ -210,9 +210,10 @@ Usage: %B${functrace[1]%:*}%b <option> [<options>]
         }
 
         cmake_args+=(
+          -DCMAKE_OSX_SYSROOT="$(xcrun --sdk macosx --show-sdk-path)"
           -DCMAKE_FRAMEWORK_PATH="${_plugin_deps}/Frameworks"
           -DCMAKE_OSX_ARCHITECTURES=${${target##*-}//universal/x86_64;arm64}
-          -DCMAKE_OSX_DEPLOYMENT_TARGET=${DEPLOYMENT_TARGET:-10.15}
+          -DCMAKE_OSX_DEPLOYMENT_TARGET=${DEPLOYMENT_TARGET:-11.0}
           -DOBS_CODESIGN_LINKER=ON
           -DOBS_BUNDLE_CODESIGN_IDENTITY="${CODESIGN_IDENT:--}"
         )

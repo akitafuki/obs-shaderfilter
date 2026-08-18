@@ -236,14 +236,20 @@ jobs:
         run: msbuild /m /p:Configuration=RelWithDebInfo .\build\obs-studio.sln
       - name: Package
         if: success()
+        shell: pwsh
         run: |
           $env:FILE_NAME="${{ env.PLUGIN_NAME }}-${{ github.sha }}-windows-${{ matrix.target }}"
           echo "FILE_NAME=${env:FILE_NAME}" >> ${env:GITHUB_ENV}
-          robocopy .\build\rundir\RelWithDebInfo\obs-plugins\${{ matrix.deps_ext }}bit\ .\package\obs-plugins\${{ matrix.deps_ext }}bit ${{ env.PLUGIN_NAME }}.* /E /XF .gitignore
-          robocopy .\build\rundir\RelWithDebInfo\data\obs-plugins\${{ env.PLUGIN_NAME }}\ .\package\data\obs-plugins\${{ env.PLUGIN_NAME }}\ /E /XF .gitignore
-          copy .\build\plugins\${{ env.PLUGIN_NAME }}\installer.iss .\installer\installer.iss
-          robocopy .\plugins\${{ env.PLUGIN_NAME}}\media\ .\installer\media\ /E /XF .gitignore
-          exit 0
+          New-Item -ItemType Directory -Force -Path .\package\obs-plugins\${{ matrix.deps_ext }}bit
+          New-Item -ItemType Directory -Force -Path .\package\data\obs-plugins\${{ env.PLUGIN_NAME }}
+          New-Item -ItemType Directory -Force -Path .\installer\media
+
+          Get-ChildItem -Path .\build -Filter "${{ env.PLUGIN_NAME }}.*" -Recurse | Where-Object { $_.Extension -match 'dll|pdb' } | ForEach-Object { Copy-Item $_.FullName -Destination .\package\obs-plugins\${{ matrix.deps_ext }}bit\ -Force }
+          Copy-Item -Path .\plugins\${{ env.PLUGIN_NAME }}\data\* -Destination .\package\data\obs-plugins\${{ env.PLUGIN_NAME }}\ -Recurse -Force
+          Get-ChildItem -Path .\build -Filter "installer.iss" -Recurse | ForEach-Object { Copy-Item $_.FullName -Destination .\installer\installer.iss -Force }
+          if (Test-Path .\plugins\${{ env.PLUGIN_NAME }}\media) {
+            Copy-Item -Path .\plugins\${{ env.PLUGIN_NAME }}\media\* -Destination .\installer\media\ -Recurse -Force
+          }
       - name: Publish zip
         if: success()
         uses: actions/upload-artifact@v4.3.1
