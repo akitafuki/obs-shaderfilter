@@ -68,12 +68,14 @@ function Build {
         Ensure-Location $ProjectRoot
 
         $DepsPath = "plugin-deps-${script:DepsVersion}-qt${script:QtVersion}-${script:Target}"
+        $ObsBuildDir = "${ProjectRoot}/../obs-studio/plugin_build_${script:Target}"
         $CmakeArgs = @(
             '-G', $CmakeGenerator
             "-DCMAKE_SYSTEM_VERSION=${script:PlatformSDK}"
             "-DCMAKE_GENERATOR_PLATFORM=$(if (${script:Target} -eq "x86") { "Win32" } else { "x64" })"
             "-DCMAKE_BUILD_TYPE=${Configuration}"
-            "-DCMAKE_PREFIX_PATH:PATH=$(Resolve-Path -Path "${ProjectRoot}/../obs-build-dependencies/${DepsPath}")"
+            "-DCMAKE_PREFIX_PATH:PATH=$(Resolve-Path -Path "${ProjectRoot}/../obs-build-dependencies/${DepsPath}");${ObsBuildDir};${ObsBuildDir}/libobs"
+            "-Dlibobs_DIR=${ObsBuildDir}/libobs"
             "-DQT_VERSION=${script:QtVersion}"
         )
 

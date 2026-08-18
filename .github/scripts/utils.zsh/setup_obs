@@ -52,8 +52,7 @@ if (( ! (${skips[(Ie)all]} + ${skips[(Ie)unpack]}) )) {
     git config remote.pluginbuild.fetch "+refs/heads/${obs_branch:-master}:refs/remotes/origin/${obs_branch:-master}"
 
     git rev-parse -q --verify "${obs_hash}^{commit}" > /dev/null || git fetch pluginbuild
-    git checkout ${obs_branch:-master} -B ${product_name}
-    git reset --hard "${obs_hash}"
+    git checkout -B ${product_name} "${obs_hash}"
     log_status 'Found existing obs-studio repository.'
   } else {
     git clone "${obs_repo:-https://github.com/obsproject/obs-studio.git}" "${PWD}"
@@ -93,8 +92,9 @@ if (( ! (${skips[(Ie)all]} + ${skips[(Ie)build]}) )) {
       }
 
       cmake_args+=(
+        -DCMAKE_OSX_SYSROOT="$(xcrun --sdk macosx --show-sdk-path)"
         -DCMAKE_OSX_ARCHITECTURES=${${target##*-}//universal/x86_64;arm64}
-        -DCMAKE_OSX_DEPLOYMENT_TARGET=${DEPLOYMENT_TARGET:-10.15}
+        -DCMAKE_OSX_DEPLOYMENT_TARGET=${DEPLOYMENT_TARGET:-11.0}
         -DOBS_CODESIGN_LINKER=ON
         -DOBS_BUNDLE_CODESIGN_IDENTITY="${CODESIGN_IDENT:--}"
       )
@@ -115,8 +115,8 @@ if (( ! (${skips[(Ie)all]} + ${skips[(Ie)build]}) )) {
   local -a cmake_args=()
   if (( _loglevel > 1 )) cmake_args+=(--verbose)
   if [[ ${generator} == 'Unix Makefiles' ]] cmake_args+=(--parallel ${num_procs})
-  cmake --build plugin_build_${target##*-} --config ${BUILD_CONFIG:-Release} ${cmake_args} -t obs-frontend-api
-  cmake --install plugin_build_${target##*-} --config ${BUILD_CONFIG:-Release} --component obs_libraries ${cmake_args}
+  cmake --build plugin_build_${target##*-} --config ${BUILD_CONFIG:-Release} ${cmake_args}
+  cmake --install plugin_build_${target##*-} --config ${BUILD_CONFIG:-Release} ${cmake_args}
 }
 
 popd
