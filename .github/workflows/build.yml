@@ -295,10 +295,22 @@ jobs:
       - name: "Package Installer (Prereqs)"
         run: |
           curl -L "https://github.com/jrsoftware/issrc/releases/download/is-6_3_3/innosetup-6.3.3.exe" -f --retry 5 -o "inno.exe"
-          .\inno.exe /VERYSILENT /SP- /SUPPRESSMSGBOXES /NORESTART
+          Start-Process -FilePath ".\inno.exe" -ArgumentList "/VERYSILENT", "/SP-", "/SUPPRESSMSGBOXES", "/NORESTART" -Wait
+          if (Test-Path "C:\Program Files (x86)\Inno Setup 6") {
+            "C:\Program Files (x86)\Inno Setup 6" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          }
+          if (Test-Path "C:\Program Files\Inno Setup 6") {
+            "C:\Program Files\Inno Setup 6" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          }
       - name: "Package Installer (Compile)"
         run: |
-          & (Get-Command iscc.exe, "C:\Program Files (x86)\Inno Setup 6\ISCC.exe", "C:\Program Files\Inno Setup 6\ISCC.exe" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source -First 1) /Qp ".\installer.iss"
+          $iscc = (Get-Command ISCC.exe -ErrorAction SilentlyContinue).Source
+          if (-not $iscc) {
+            if (Test-Path "C:\Program Files (x86)\Inno Setup 6\ISCC.exe") { $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" }
+            elseif (Test-Path "C:\Program Files\Inno Setup 6\ISCC.exe") { $iscc = "C:\Program Files\Inno Setup 6\ISCC.exe" }
+          }
+          if (-not $iscc) { throw "ISCC.exe not found!" }
+          & $iscc /Qp ".\installer.iss"
       - name: Publish installer
         if: success()
         uses: actions/upload-artifact@v4.3.1

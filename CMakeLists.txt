@@ -27,17 +27,12 @@ target_sources(${PROJECT_NAME} PRIVATE
 	shader-transition.c
 	version.h)
 	
+if(POLICY CMP0177)
+  cmake_policy(SET CMP0177 NEW)
+endif()
+
 if(BUILD_OUT_OF_TREE)
-  find_package(libobs QUIET)
-  if(NOT TARGET OBS::libobs AND NOT libobs_FOUND AND NOT LIBOBS_FOUND)
-    find_package(PkgConfig QUIET)
-    if(PkgConfig_FOUND)
-      pkg_check_modules(LIBOBS IMPORTED_TARGET libobs)
-      if(TARGET PkgConfig::LIBOBS)
-        add_library(OBS::libobs ALIAS PkgConfig::LIBOBS)
-      endif()
-    endif()
-  endif()
+  find_package(libobs REQUIRED)
   include(cmake/ObsPluginHelpers.cmake)
 endif()
 

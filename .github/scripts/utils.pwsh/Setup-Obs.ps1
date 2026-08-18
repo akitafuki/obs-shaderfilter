@@ -77,7 +77,7 @@ function Setup-Obs {
             $CmakeArgs+=('--verbose')
         }
 
-        Invoke-External cmake --build plugin_build_${script:Target} @CmakeArgs -t obs-frontend-api
+        Invoke-External cmake --build plugin_build_${script:Target} @CmakeArgs
         Invoke-External cmake --install plugin_build_${script:Target} @CmakeArgs
     }
     Pop-Location -Stack BuildTemp
