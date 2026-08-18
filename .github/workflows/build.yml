@@ -146,6 +146,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          sudo add-apt-repository -y ppa:obsproject/obs-studio
           sudo apt-get update
           sudo apt-get install -y libobs-dev libobs0 cmake ninja-build build-essential
 
@@ -211,7 +212,7 @@ jobs:
       - name: 'Install prerequisite: QT'
         run: |
           curl -LO https://github.com/obsproject/obs-deps/releases/download/${{ env.WINDOWS_DEPS_VERSION }}/windows-deps-qt6-${{ env.WINDOWS_DEPS_VERSION }}-${{ matrix.target }}.zip -f --retry 5 -C -
-          7z x windows-deps-qt6-${{ env.WINDOWS_DEPS_VERSION }}-${{ matrix.target }}.zip -o"${{ github.workspace }}/cmbuild/deps"
+          7z x windows-deps-qt6-${{ env.WINDOWS_DEPS_VERSION }}-${{ matrix.target }}.zip -o"${{ github.workspace }}/cmbuild/deps/qt6"
       - name: 'Install prerequisite: Pre-built dependencies'
         run: |
           curl -LO https://github.com/obsproject/obs-deps/releases/download/${{ env.WINDOWS_DEPS_VERSION }}/windows-deps-${{ env.WINDOWS_DEPS_VERSION }}-${{ matrix.target }}.zip -f --retry 5 -C -
@@ -279,7 +280,7 @@ jobs:
           path: package/*
       - name: "Package Installer (Prereqs)"
         run: |
-          curl "-L" "https://files.jrsoftware.org/is/6/innosetup-6.0.3.exe" "-f" "--retry" "5" "-o" "inno.exe"
+          curl "-L" "https://github.com/jrsoftware/issrc/releases/download/is-6_3_3/innosetup-6.3.3.exe" "-f" "--retry" "5" "-o" "inno.exe"
           .\inno.exe /VERYSILENT /SP- /SUPPRESSMSGBOXES /NORESTART
       - name: "Package Installer (Compile)"
         run: |
