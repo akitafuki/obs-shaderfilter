@@ -294,11 +294,11 @@ jobs:
           path: package/*
       - name: "Package Installer (Prereqs)"
         run: |
-          curl "-L" "https://github.com/jrsoftware/issrc/releases/download/is-6_3_3/innosetup-6.3.3.exe" "-f" "--retry" "5" "-o" "inno.exe"
+          curl -L "https://github.com/jrsoftware/issrc/releases/download/is-6_3_3/innosetup-6.3.3.exe" -f --retry 5 -o "inno.exe"
           .\inno.exe /VERYSILENT /SP- /SUPPRESSMSGBOXES /NORESTART
       - name: "Package Installer (Compile)"
         run: |
-          & 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' /Qp ".\installer.iss"
+          & (Get-Command iscc.exe, "C:\Program Files (x86)\Inno Setup 6\ISCC.exe", "C:\Program Files\Inno Setup 6\ISCC.exe" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source -First 1) /Qp ".\installer.iss"
       - name: Publish installer
         if: success()
         uses: actions/upload-artifact@v4.3.1
