@@ -63,7 +63,7 @@ jobs:
       - name: Select Xcode version
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '15.4'
+          xcode-version: 'latest-stable'
 
       - name: Setup Environment
         id: setup
@@ -144,14 +144,13 @@ jobs:
 
   linux:
     name: 'Linux'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
-          sudo add-apt-repository -y ppa:obsproject/obs-studio
           sudo apt-get update
           sudo apt-get install -y libobs-dev libobs0 qt6-base-dev cmake ninja-build build-essential
 
@@ -232,7 +231,7 @@ jobs:
           mkdir ./installer
           mkdir ./installer/media
           mkdir ./build
-          cmake -S . -B "${{ github.workspace }}/build" -G "${{ env.CMAKE_GENERATOR }}" -A "${{ matrix.cmake_build }}" -DCMAKE_PREFIX_PATH:PATH="${{ github.workspace }}/cmbuild/deps" -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" -DBUILD_BROWSER=false -DBUILD_VST=false -DBUILD_VIRTUALCAM=false -DBUILD_CAPTIONS=false -DCOMPILE_D3D12_HOOK=false -DENABLE_SCRIPTING=false -DDepsPath="${{ github.workspace }}/cmbuild/deps" -DDepsPath${{ matrix.deps_ext }}="${{ github.workspace }}/cmbuild/deps" -DQTDIR="${{ github.workspace }}/cmbuild/deps/qt6" -DCOPIED_DEPENDENCIES=FALSE -DCOPY_DEPENDENCIES=TRUE -DENABLE_PLUGINS=TRUE -DDISABLE_PLUGINS=FALSE -DENABLE_BROWSER=FALSE -DENABLE_WEBSOCKET=FALSE
+          cmake -S . -B "${{ github.workspace }}/build" -G "${{ env.CMAKE_GENERATOR }}" -A "${{ matrix.cmake_build }}" -DCMAKE_PREFIX_PATH:PATH="${{ github.workspace }}/cmbuild/deps" -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" -DENABLE_UI=FALSE -DENABLE_AJA=FALSE -DENABLE_DECKLINK=FALSE -DENABLE_WEBSOCKET=FALSE -DENABLE_BROWSER=FALSE -DENABLE_SCRIPTING=FALSE -DENABLE_VLC=FALSE -DENABLE_NEWTEK_NDI=FALSE -DDISABLE_PLUGINS=TRUE -DDepsPath="${{ github.workspace }}/cmbuild/deps" -DDepsPath${{ matrix.deps_ext }}="${{ github.workspace }}/cmbuild/deps" -DQTDIR="${{ github.workspace }}/cmbuild/deps/qt6" -DCOPIED_DEPENDENCIES=FALSE -DCOPY_DEPENDENCIES=TRUE
       - name: 'Build'
         run: msbuild /m /p:Configuration=RelWithDebInfo .\build\obs-studio.sln
       - name: Package
