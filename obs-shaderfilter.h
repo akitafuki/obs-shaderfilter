@@ -167,6 +167,14 @@ struct shader_filter_data {
   bool auto_reload;
   int64_t last_file_time;
 
+  double render_scale;
+  int render_width;
+  int render_height;
+
+  int fps_throttle;
+  float time_since_last_render;
+  bool has_rendered_frame;
+
   struct vec2 uv_offset;
   struct vec2 uv_scale;
   struct vec2 uv_pixel_interval;

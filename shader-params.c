@@ -509,6 +509,20 @@ obs_properties_t *shader_filter_properties(void *data) {
     obs_properties_add_int(props, "expand_right", obs_module_text("ShaderFilter.ExpandRight"), 0, 9999, 1);
     obs_properties_add_int(props, "expand_top", obs_module_text("ShaderFilter.ExpandTop"), 0, 9999, 1);
     obs_properties_add_int(props, "expand_bottom", obs_module_text("ShaderFilter.ExpandBottom"), 0, 9999, 1);
+
+    obs_property_t *scale_prop =
+        obs_properties_add_float_slider(props, "render_scale", obs_module_text("ShaderFilter.RenderScale"), 10.0, 100.0, 5.0);
+    obs_property_float_set_suffix(scale_prop, "%");
+
+    obs_property_t *fps_prop = obs_properties_add_list(props, "fps_throttle", obs_module_text("ShaderFilter.FPSThrottle"),
+                                                       OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_INT);
+    obs_property_list_add_int(fps_prop, obs_module_text("ShaderFilter.FPS.Canvas"), 0);
+    obs_property_list_add_int(fps_prop, obs_module_text("ShaderFilter.FPS.60"), 60);
+    obs_property_list_add_int(fps_prop, obs_module_text("ShaderFilter.FPS.30"), 30);
+    obs_property_list_add_int(fps_prop, obs_module_text("ShaderFilter.FPS.24"), 24);
+    obs_property_list_add_int(fps_prop, obs_module_text("ShaderFilter.FPS.15"), 15);
+    obs_property_list_add_int(fps_prop, obs_module_text("ShaderFilter.FPS.10"), 10);
+    obs_property_list_add_int(fps_prop, obs_module_text("ShaderFilter.FPS.5"), 5);
   }
 
   obs_properties_add_bool(props, "override_entire_effect", obs_module_text("ShaderFilter.OverrideEntireEffect"));

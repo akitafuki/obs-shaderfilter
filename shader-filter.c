@@ -64,6 +64,10 @@ void shader_filter_update(void *data, obs_data_t *settings) {
   filter->expand_bottom = (int)obs_data_get_int(settings, "expand_bottom");
   filter->rand_activation_f = (float)((double)rand_interval(0, 10000) / (double)10000);
   filter->auto_reload = obs_data_get_bool(settings, "auto_reload");
+  filter->render_scale = obs_data_get_double(settings, "render_scale");
+  if (filter->render_scale <= 0.0)
+    filter->render_scale = 100.0;
+  filter->fps_throttle = (int)obs_data_get_int(settings, "fps_throttle");
 
   if (filter->reload_effect) {
     filter->reload_effect = false;
@@ -315,6 +319,20 @@ void shader_filter_tick(void *data, float seconds) {
 
   filter->total_width = filter->expand_left + base_width + filter->expand_right;
   filter->total_height = filter->expand_top + base_height + filter->expand_bottom;
+
+  double scale_factor = filter->render_scale / 100.0;
+  if (scale_factor < 0.1)
+    scale_factor = 0.1;
+  if (scale_factor > 1.0)
+    scale_factor = 1.0;
+  filter->render_width = (int)((double)filter->total_width * scale_factor);
+  if (filter->render_width < 1)
+    filter->render_width = 1;
+  filter->render_height = (int)((double)filter->total_height * scale_factor);
+  if (filter->render_height < 1)
+    filter->render_height = 1;
+
+  filter->time_since_last_render += seconds;
 
   filter->uv_size.x = (float)filter->total_width;
   filter->uv_size.y = (float)filter->total_height;
@@ -614,18 +632,21 @@ static void render_shader(struct shader_filter_data *filter, float f, obs_source
   gs_enable_blending(false);
   gs_blend_function(GS_BLEND_ONE, GS_BLEND_ZERO);
 
+  int target_w = filter->render_width > 0 ? filter->render_width : filter->total_width;
+  int target_h = filter->render_height > 0 ? filter->render_height : filter->total_height;
+
   if (filter->param_pass_texture) {
     filter->intermediate_texrender = create_or_reset_texrender(filter->intermediate_texrender);
-    if (gs_texrender_begin(filter->intermediate_texrender, filter->total_width, filter->total_height)) {
-      gs_ortho(0.0f, (float)filter->total_width, 0.0f, (float)filter->total_height, -100.0f, 100.0f);
+    if (gs_texrender_begin(filter->intermediate_texrender, target_w, target_h)) {
+      gs_ortho(0.0f, (float)target_w, 0.0f, (float)target_h, -100.0f, 100.0f);
       if (filter->use_template) {
-        gs_draw_sprite(texture, 0, filter->total_width, filter->total_height);
+        gs_draw_sprite(texture, 0, target_w, target_h);
       } else {
         if (!filter->sprite_buffer)
           load_sprite_buffer(filter);
 
         struct gs_vb_data *data = gs_vertexbuffer_get_data(filter->sprite_buffer);
-        build_sprite_norm(data, (float)filter->total_width, (float)filter->total_height);
+        build_sprite_norm(data, (float)target_w, (float)target_h);
         gs_vertexbuffer_flush(filter->sprite_buffer);
         gs_load_vertexbuffer(filter->sprite_buffer);
         gs_load_indexbuffer(NULL);
@@ -636,17 +657,17 @@ static void render_shader(struct shader_filter_data *filter, float f, obs_source
     gs_effect_set_texture(filter->param_pass_texture, gs_texrender_get_texture(filter->intermediate_texrender));
   }
 
-  if (gs_texrender_begin(filter->output_texrender, filter->total_width, filter->total_height)) {
-    gs_ortho(0.0f, (float)filter->total_width, 0.0f, (float)filter->total_height, -100.0f, 100.0f);
+  if (gs_texrender_begin(filter->output_texrender, target_w, target_h)) {
+    gs_ortho(0.0f, (float)target_w, 0.0f, (float)target_h, -100.0f, 100.0f);
     while (gs_effect_loop(filter->effect, "Draw")) {
       if (filter->use_template) {
-        gs_draw_sprite(texture, 0, filter->total_width, filter->total_height);
+        gs_draw_sprite(texture, 0, target_w, target_h);
       } else {
         if (!filter->sprite_buffer)
           load_sprite_buffer(filter);
 
         struct gs_vb_data *data = gs_vertexbuffer_get_data(filter->sprite_buffer);
-        build_sprite_norm(data, (float)filter->total_width, (float)filter->total_height);
+        build_sprite_norm(data, (float)target_w, (float)target_h);
         gs_vertexbuffer_flush(filter->sprite_buffer);
         gs_load_vertexbuffer(filter->sprite_buffer);
         gs_load_indexbuffer(NULL);
@@ -679,13 +700,24 @@ static void shader_filter_render(void *data, gs_effect_t *effect) {
     return;
   }
 
+  if (f == 0.0f && filter->fps_throttle > 0 && filter->has_rendered_frame) {
+    float target_interval = 1.0f / (float)filter->fps_throttle;
+    if (filter->time_since_last_render < target_interval) {
+      draw_output(filter);
+      return;
+    }
+  }
+
   get_input_source(filter);
 
   filter->rendering = true;
   render_shader(filter, f, filter_to);
   draw_output(filter);
-  if (f == 0.0f)
+  if (f == 0.0f) {
     filter->output_rendered = true;
+    filter->time_since_last_render = 0.0f;
+    filter->has_rendered_frame = true;
+  }
   filter->rendering = false;
 }
 
@@ -702,6 +734,8 @@ static uint32_t shader_filter_getheight(void *data) {
 static void shader_filter_defaults(obs_data_t *settings) {
   obs_data_set_default_string(settings, "shader_text", effect_template_default_image_shader);
   obs_data_set_default_bool(settings, "auto_reload", false);
+  obs_data_set_default_double(settings, "render_scale", 100.0);
+  obs_data_set_default_int(settings, "fps_throttle", 0);
 }
 
 static enum gs_color_space shader_filter_get_color_space(void *data, size_t count, const enum gs_color_space *preferred_spaces) {
