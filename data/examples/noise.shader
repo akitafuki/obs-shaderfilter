@@ -38,19 +38,20 @@ float4 mainImage(VertData v_in) : TARGET
   float4 x;
 
   if (monochromatic) {
-    x = rand(float2(v_in.uv.x, v_in.uv.y) * scale + time + scale);
+    float r = rand(float2(v_in.uv.x, v_in.uv.y) * scale + time + scale);
+    x = float4(r, r, r, 1.0);
   } else {
     x = float4(
       rand(float2(v_in.uv.x, v_in.uv.y) * scale + time + 1 * scale),
       rand(float2(v_in.uv.x, v_in.uv.y) * scale + time + 2 * scale),
       rand(float2(v_in.uv.x, v_in.uv.y) * scale + time + 3 * scale),
-      1
+      1.0
     );
   }
 
   float4 rgba = image.Sample(textureSampler, v_in.uv);
 
-  float3 output = lerp(rgba, x, noiseLevel);
+  float3 out_col = lerp(rgba.rgb, x.rgb, noiseLevel);
 
-  return float4(output.r, output.g, output.b, rgba.a);
+  return float4(out_col.r, out_col.g, out_col.b, rgba.a);
 }
