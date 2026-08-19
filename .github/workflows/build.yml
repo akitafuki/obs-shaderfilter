@@ -34,11 +34,11 @@ jobs:
       - name: Install OBS & Graphics Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libobs-dev libobs0t64 libgl1-mesa-dev libegl1-mesa-dev
+          sudo apt-get install -y libobs-dev libobs0t64 libgl1-mesa-dev libegl1-mesa-dev libgl1-mesa-dri xvfb
       - name: Run Native OpenGL Shader Compilation Test
         run: |
           gcc -O2 -I/usr/include/obs scripts/test_shaders_gl.c -lobs -o test_shaders_gl
-          ./test_shaders_gl
+          LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a ./test_shaders_gl
 
   macos:
     name: macOS
@@ -244,7 +244,7 @@ jobs:
           mkdir ./installer
           mkdir ./installer/media
           mkdir ./build
-          cmake -S . -B "${{ github.workspace }}/build" -A "${{ matrix.cmake_build }}" -DCMAKE_PREFIX_PATH:PATH="${{ github.workspace }}/cmbuild/deps" -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" -DBUILD_BROWSER=OFF -DBUILD_VST=OFF -DBUILD_VIRTUALCAM=OFF -DBUILD_CAPTIONS=OFF -DCOMPILE_D3D12_HOOK=OFF -DENABLE_SCRIPTING=OFF -DENABLE_WEBSOCKET=OFF -DENABLE_AJA=OFF -DENABLE_DECKLINK=OFF -DENABLE_VLC=OFF -DENABLE_PLUGINS=ON -DDISABLE_PLUGINS=OFF -DDepsPath="${{ github.workspace }}/cmbuild/deps" -DDepsPath${{ matrix.deps_ext }}="${{ github.workspace }}/cmbuild/deps" -DQTDIR="${{ github.workspace }}/cmbuild/deps/qt6"
+          cmake -S . -B "${{ github.workspace }}/build" -A "${{ matrix.cmake_build }}" -DCMAKE_PREFIX_PATH:PATH="${{ github.workspace }}/cmbuild/deps" -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" -DCMAKE_CXX_FLAGS="-D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS -D_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS" -DENABLE_WINRT=OFF -DBUILD_BROWSER=OFF -DBUILD_VST=OFF -DBUILD_VIRTUALCAM=OFF -DBUILD_CAPTIONS=OFF -DCOMPILE_D3D12_HOOK=OFF -DENABLE_SCRIPTING=OFF -DENABLE_WEBSOCKET=OFF -DENABLE_AJA=OFF -DENABLE_DECKLINK=OFF -DENABLE_VLC=OFF -DENABLE_PLUGINS=ON -DDISABLE_PLUGINS=OFF -DDepsPath="${{ github.workspace }}/cmbuild/deps" -DDepsPath${{ matrix.deps_ext }}="${{ github.workspace }}/cmbuild/deps" -DQTDIR="${{ github.workspace }}/cmbuild/deps/qt6"
       - name: 'Build'
         run: cmake --build "${{ github.workspace }}/build" --config RelWithDebInfo --parallel
       - name: Package

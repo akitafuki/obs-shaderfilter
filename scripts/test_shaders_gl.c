@@ -136,9 +136,11 @@ int main() {
   ovi.output_format = VIDEO_FORMAT_RGBA;
   ovi.adapter = 0;
   ovi.colorspace = VIDEO_CS_SRGB;
-  ovi.range = VIDEO_RANGE_FULL;
-  if (obs_reset_video(&ovi) != OBS_VIDEO_SUCCESS)
+  if (obs_reset_video(&ovi) != OBS_VIDEO_SUCCESS) {
+    fprintf(stderr, "Error: obs_reset_video failed to initialize OpenGL graphics context\n");
+    obs_shutdown();
     return 1;
+  }
 
   int total = 0, passed = 0, failed = 0;
   obs_enter_graphics();
