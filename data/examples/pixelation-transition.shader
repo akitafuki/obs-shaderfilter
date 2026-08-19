@@ -44,7 +44,7 @@ float4 mainImage(VertData v_in) : TARGET
 	uv /= scale;
 	uv /= uv_size;
 	uv += float2(center_x, center_y);
-	uv = clamp(uv, 1.0/uv_size, 1.0);
+	uv = clamp(uv, 1.0 / uv_size, float2(1.0, 1.0));
 	float4 rgba = image.Sample(textureSampler, uv);
 	if(convert_linear)
         rgba.rgb = srgb_nonlinear_to_linear(rgba.rgb);

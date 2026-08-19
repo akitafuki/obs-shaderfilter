@@ -96,7 +96,7 @@ float4 gaussian(VertData v_in, float angle)
 	return ret + px_away + px_2_away;
 }
 
-ColorData setColorData(VertData v_in): SV_TARGET0
+ColorData setColorData(VertData v_in)
 {
 	//string RenderTarget0 = "initial_image";
 	ColorData cd;// = (ColorData)0;
