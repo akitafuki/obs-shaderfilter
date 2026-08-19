@@ -682,10 +682,8 @@ obs_properties_t *shader_filter_properties(void *data) {
   }
   da_free(groups);
 
-  obs_properties_add_text(
-      props, "plugin_info",
-      "<a href=\"https://obsproject.com/forum/resources/obs-shaderfilter.1736/\">obs-shaderfilter</a> (" PROJECT_VERSION
-      ") by <a href=\"https://www.exeldro.com\">Exeldro</a>",
-      OBS_TEXT_INFO);
+  obs_properties_add_text(props, "plugin_info",
+                          "<a href=\"https://github.com/akitafuki/obs-shaderfilter\">obs-shaderfilter</a> v" PROJECT_VERSION,
+                          OBS_TEXT_INFO);
   return props;
 }
