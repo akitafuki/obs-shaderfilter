@@ -192,10 +192,12 @@ Usage: %B${functrace[1]%:*}%b <option> [<options>]
 
     local _plugin_deps="${project_root:h}/obs-build-dependencies/plugin-deps-${OBS_DEPS_VERSION}-qt${QT_VERSION}-${target##*-}"
     local _obs_build_dir="${project_root:h}/obs-studio/plugin_build_${target##*-}"
+    local _obs_src_dir="${project_root:h}/obs-studio"
     local -a cmake_args=(
       -DCMAKE_BUILD_TYPE=${BUILD_CONFIG:-RelWithDebInfo}
       -DQT_VERSION=${QT_VERSION}
-      -DCMAKE_PREFIX_PATH="${_plugin_deps};${_obs_build_dir};${_obs_build_dir}/libobs"
+      -DCMAKE_PREFIX_PATH="${_plugin_deps};${_obs_build_dir};${_obs_build_dir}/libobs;${_obs_src_dir}/deps/simde"
+      -DCMAKE_MODULE_PATH="${_obs_src_dir}/cmake/Modules"
       -Dlibobs_DIR="${_obs_build_dir}/libobs"
     )
 
@@ -215,7 +217,7 @@ Usage: %B${functrace[1]%:*}%b <option> [<options>]
           -DCMAKE_OSX_SYSROOT="$(xcrun --sdk macosx --show-sdk-path)"
           -DCMAKE_FRAMEWORK_PATH="${_plugin_deps}/Frameworks"
           -DCMAKE_OSX_ARCHITECTURES=${${target##*-}//universal/x86_64;arm64}
-          -DCMAKE_OSX_DEPLOYMENT_TARGET=${DEPLOYMENT_TARGET:-11.0}
+          -DCMAKE_OSX_DEPLOYMENT_TARGET=${DEPLOYMENT_TARGET:-13.0}
           -DOBS_CODESIGN_LINKER=ON
           -DOBS_BUNDLE_CODESIGN_IDENTITY="${CODESIGN_IDENT:--}"
         )
