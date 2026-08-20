@@ -31,6 +31,8 @@ if(POLICY CMP0177)
   cmake_policy(SET CMP0177 NEW)
 endif()
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules")
+
 if(BUILD_OUT_OF_TREE)
   find_package(libobs QUIET)
   if(NOT TARGET OBS::libobs)
