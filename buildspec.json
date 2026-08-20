@@ -1,10 +1,10 @@
 {
     "dependencies": {
         "obs-studio": {
-            "version": "30.2.3",
+            "version": "32.2.2",
             "repository": "https://github.com/obsproject/obs-studio.git",
             "branch": "master",
-            "hash": "30.2.3"
+            "hash": "32.2.2"
         },
         "prebuilt": {
             "version": "2024-01-18",
@@ -13,7 +13,6 @@
             "hashes": {
                 "macos-x86_64": "af53f0bc657f6cbda9d041e069542cd5006ffab65a6adba7fcc52c146fe8ad90",
                 "macos-arm64": "f4b3bcd1667da0b3ddd4ac8183c2bfaf1912c0bd47146625015acb15c722a3cd",
-                "macos-universal": "53214a1f3aece7957126ddb03f8261106a0200b7a953ae119f05f0b8d7db87f7",
                 "windows-x64": "5e78964e1d54602138f13429445502855adbae88adb41f2e92779eadbd5698a1"
             }
         },
@@ -24,7 +23,6 @@
             "hashes": {
                 "macos-x86_64": "085906c1755d94406fe7d450890ca031ffdf2e9fe969fcebd20daa2cc23b0530",
                 "macos-arm64": "38dbe11f5b518bff9dde205dcdf1c6c6bbda86981417c1c4480407f2e6259be4",
-                "macos-universal": "8d3a8ff028c0c5e1ed8ab1b81da483f151b3ea214390a9b1fef30f836938c1bb",
                 "windows-x64": "59155432b6ea0044f4399ebcf83e882112d4aedae99d00b4f6f765e5897f752b"
             }
         }
@@ -32,15 +30,11 @@
     "platformConfig": {
         "macos-x86_64": {
             "qtVersion": 6,
-            "deploymentTarget": "11.0"
+            "deploymentTarget": "13.0"
         },
         "macos-arm64": {
             "qtVersion": 6,
-            "deploymentTarget": "11.0"
-        },
-        "macos-universal": {
-            "qtVersion": 6,
-            "deploymentTarget": "11.0"
+            "deploymentTarget": "13.0"
         },
         "windows-x64": {
             "qtVersion": 6,

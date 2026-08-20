@@ -13,7 +13,7 @@ permissions:
 
 env:
   PLUGIN_NAME: obs-shaderfilter
-  OBS_VERSION: 30.2.3
+  OBS_VERSION: 32.2.2
 jobs:
   validate-shaders:
     name: Validate Shaders
@@ -46,13 +46,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [x86_64, arm64, universal]
+        arch: [arm64, x86_64]
     outputs:
       commitHash: ${{ steps.setup.outputs.commitHash }}
     env:
       CODESIGN_IDENT: '-'
       CODESIGN_IDENT_INSTALLER: ''
-      MACOSX_DEPLOYMENT_TARGET: '11.0'  
+      MACOSX_DEPLOYMENT_TARGET: '13.0'  
     defaults:
       run:
         shell: zsh {0}
