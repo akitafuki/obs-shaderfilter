@@ -92,6 +92,10 @@ jobs:
           if (( #to_remove > 0 )) brew uninstall --ignore-dependencies ${to_remove}
           print '::endgroup::'
 
+          print '::group::Install SIMDe dependency'
+          brew install simde
+          print '::endgroup::'
+
           print '::group::Set up code signing'
           if [[ '${{ secrets.MACOS_SIGNING_APPLICATION_IDENTITY }}' != '' && \
                 '${{ secrets.MACOS_SIGNING_INSTALLER_IDENTITY }}' != '' && \

@@ -5,10 +5,13 @@ find_path(
   SIMDE_INCLUDE_DIR
   NAMES simde/simde-features.h simde/simde-common.h simde/x86/sse.h
   PATHS
+    $ENV{HOMEBREW_PREFIX}/include
     /opt/homebrew/include
     /usr/local/include
     /usr/include
-    ${CMAKE_PREFIX_PATH}
+    "${CMAKE_SOURCE_DIR}/../obs-studio/deps/simde"
+    "${CMAKE_SOURCE_DIR}/obs-studio/deps/simde"
+    "${CMAKE_PREFIX_PATH}"
   PATH_SUFFIXES
     simde
     include
