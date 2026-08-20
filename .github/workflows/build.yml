@@ -164,7 +164,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libobs-dev libobs0 qt6-base-dev cmake ninja-build build-essential
+          sudo apt-get install -y libobs-dev libobs0t64 cmake ninja-build build-essential
 
       - name: Configure CMake
         run: |
