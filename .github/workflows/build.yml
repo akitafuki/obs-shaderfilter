@@ -203,9 +203,7 @@ jobs:
             cmake_build: 'x64'
             deps_ext: '64'
     env:
-      QT_VERSION: '6.6.3'
       CMAKE_SYSTEM_VERSION: "10.0.22621.0"
-      WINDOWS_DEPS_VERSION: '2024-02-20'
     steps:
       - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
@@ -226,25 +224,13 @@ jobs:
         run: echo add_subdirectory(${{ env.PLUGIN_NAME }}) > plugins/CMakeLists.txt
       - name: Fetch Git Tags
         run: git fetch --prune --tags --unshallow
-      - name: 'Install prerequisite: QT'
-        shell: pwsh
-        run: |
-          curl.exe -LO "https://github.com/obsproject/obs-deps/releases/download/${{ env.WINDOWS_DEPS_VERSION }}/windows-deps-qt6-${{ env.WINDOWS_DEPS_VERSION }}-${{ matrix.target }}.zip" -f --retry 5
-          New-Item -ItemType Directory -Force -Path "${{ github.workspace }}/cmbuild/deps/qt6"
-          tar.exe -xf "windows-deps-qt6-${{ env.WINDOWS_DEPS_VERSION }}-${{ matrix.target }}.zip" -C "${{ github.workspace }}/cmbuild/deps/qt6"
-      - name: 'Install prerequisite: Pre-built dependencies'
-        shell: pwsh
-        run: |
-          curl.exe -LO "https://github.com/obsproject/obs-deps/releases/download/${{ env.WINDOWS_DEPS_VERSION }}/windows-deps-${{ env.WINDOWS_DEPS_VERSION }}-${{ matrix.target }}.zip" -f --retry 5
-          New-Item -ItemType Directory -Force -Path "${{ github.workspace }}/cmbuild/deps"
-          tar.exe -xf "windows-deps-${{ env.WINDOWS_DEPS_VERSION }}-${{ matrix.target }}.zip" -C "${{ github.workspace }}/cmbuild/deps"
       - name: Configure
         run: |
           mkdir ./package
           mkdir ./installer
           mkdir ./installer/media
           mkdir ./build
-          cmake -S . -B "${{ github.workspace }}/build" -A "${{ matrix.cmake_build }}" -DCMAKE_PREFIX_PATH:PATH="${{ github.workspace }}/cmbuild/deps" -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" -DCMAKE_CXX_FLAGS="/EHsc -D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS -D_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS" -DENABLE_WINRT=OFF -DENABLE_UI=OFF -DENABLE_FRONTEND_API=OFF -DBUILD_BROWSER=OFF -DBUILD_VST=OFF -DBUILD_VIRTUALCAM=OFF -DBUILD_CAPTIONS=OFF -DCOMPILE_D3D12_HOOK=OFF -DENABLE_SCRIPTING=OFF -DENABLE_WEBSOCKET=OFF -DENABLE_AJA=OFF -DENABLE_DECKLINK=OFF -DENABLE_VLC=OFF -DENABLE_PLUGINS=ON -DDISABLE_PLUGINS=OFF -DDepsPath="${{ github.workspace }}/cmbuild/deps" -DDepsPath${{ matrix.deps_ext }}="${{ github.workspace }}/cmbuild/deps" -DQTDIR="${{ github.workspace }}/cmbuild/deps/qt6"
+          cmake -S . -B "${{ github.workspace }}/build" -A "${{ matrix.cmake_build }}" -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" -DCMAKE_CXX_FLAGS="/EHsc -D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS -D_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS" -DENABLE_WINRT=OFF -DENABLE_UI=OFF -DENABLE_FRONTEND_API=OFF -DBUILD_BROWSER=OFF -DBUILD_VST=OFF -DBUILD_VIRTUALCAM=OFF -DBUILD_CAPTIONS=OFF -DCOMPILE_D3D12_HOOK=OFF -DENABLE_SCRIPTING=OFF -DENABLE_WEBSOCKET=OFF -DENABLE_AJA=OFF -DENABLE_DECKLINK=OFF -DENABLE_VLC=OFF -DENABLE_PLUGINS=ON -DDISABLE_PLUGINS=OFF
       - name: 'Build'
         run: cmake --build "${{ github.workspace }}/build" --config RelWithDebInfo --target ${{ env.PLUGIN_NAME }} --parallel
       - name: Package
