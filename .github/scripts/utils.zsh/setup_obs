@@ -74,6 +74,7 @@ if (( ! (${skips[(Ie)all]} + ${skips[(Ie)build]}) )) {
     -DQT_VERSION=${QT_VERSION}
     -DENABLE_PLUGINS=OFF
     -DENABLE_UI=OFF
+    -DENABLE_FRONTEND_API=OFF
     -DENABLE_SCRIPTING=OFF
     -DCMAKE_INSTALL_PREFIX="${project_root:h}/obs-build-dependencies/plugin-deps-${OBS_DEPS_VERSION}-qt${QT_VERSION}-${target##*-}"
     -DCMAKE_PREFIX_PATH="${project_root:h}/obs-build-dependencies/plugin-deps-${OBS_DEPS_VERSION}-qt${QT_VERSION}-${target##*-}"
@@ -94,7 +95,7 @@ if (( ! (${skips[(Ie)all]} + ${skips[(Ie)build]}) )) {
       cmake_args+=(
         -DCMAKE_OSX_SYSROOT="$(xcrun --sdk macosx --show-sdk-path)"
         -DCMAKE_OSX_ARCHITECTURES=${${target##*-}//universal/x86_64;arm64}
-        -DCMAKE_OSX_DEPLOYMENT_TARGET=${DEPLOYMENT_TARGET:-11.0}
+        -DCMAKE_OSX_DEPLOYMENT_TARGET=${DEPLOYMENT_TARGET:-13.0}
         -DOBS_CODESIGN_LINKER=ON
         -DOBS_BUNDLE_CODESIGN_IDENTITY="${CODESIGN_IDENT:--}"
       )
@@ -111,12 +112,14 @@ if (( ! (${skips[(Ie)all]} + ${skips[(Ie)build]}) )) {
   log_debug "Attempting to configure OBS with CMake arguments: ${cmake_args}"
   cmake -S . -B plugin_build_${target##*-} -G ${generator} ${cmake_args}
 
-  log_info 'Building libobs and obs-frontend-api...'
+  log_info 'Building libobs...'
   local -a cmake_args=()
   if (( _loglevel > 1 )) cmake_args+=(--verbose)
   if [[ ${generator} == 'Unix Makefiles' ]] cmake_args+=(--parallel ${num_procs})
-  cmake --build plugin_build_${target##*-} --config ${BUILD_CONFIG:-Release} --target libobs --target obs-frontend-api ${cmake_args}
-  cmake --install plugin_build_${target##*-} --config ${BUILD_CONFIG:-Release} ${cmake_args}
+  cmake --build plugin_build_${target##*-} --config ${BUILD_CONFIG:-Release} --target libobs ${cmake_args}
+  cmake --install plugin_build_${target##*-} --config ${BUILD_CONFIG:-Release} --component libobs ${cmake_args} || \
+  cmake --install plugin_build_${target##*-} --config ${BUILD_CONFIG:-Release} --component obs_libraries ${cmake_args} || \
+  cmake --install plugin_build_${target##*-} --config ${BUILD_CONFIG:-Release} ${cmake_args} || true
 }
 
 popd
