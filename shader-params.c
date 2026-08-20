@@ -554,8 +554,8 @@ obs_properties_t *shader_filter_properties(void *data) {
     obs_data_release(settings);
   }
 
-  obs_properties_add_button(props, "reload_effect", obs_module_text("ShaderFilter.ReloadEffect"),
-                            shader_filter_reload_effect_clicked);
+  obs_properties_add_button2(props, "reload_effect", obs_module_text("ShaderFilter.ReloadEffect"),
+                             shader_filter_reload_effect_clicked, filter);
   obs_properties_add_bool(props, "auto_reload", obs_module_text("ShaderFilter.AutoReload"));
 
   if (filter && (filter->param_audio_magnitude || filter->param_audio_peak)) {
