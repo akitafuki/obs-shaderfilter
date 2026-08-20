@@ -31,6 +31,14 @@ jobs:
         run: |
           clang-format --version
           find . -maxdepth 1 -type f \( -name "*.c" -o -name "*.h" \) -exec clang-format --dry-run --Werror {} +
+      - name: Install OBS & Graphics Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libobs-dev libobs0t64 libgl1-mesa-dev libegl1-mesa-dev libgl1-mesa-dri xvfb
+      - name: Run Native OpenGL Shader Compilation Test
+        run: |
+          gcc -O2 -I/usr/include/obs scripts/test_shaders_gl.c -lobs -o test_shaders_gl
+          LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a ./test_shaders_gl
 
   macos:
     name: macOS
@@ -185,7 +193,7 @@ jobs:
 
   windows-build:
     name: 'Windows Build'
-    runs-on: windows-2022
+    runs-on: windows-2025
     strategy:
       fail-fast: true
       matrix:
@@ -196,7 +204,6 @@ jobs:
             deps_ext: '64'
     env:
       QT_VERSION: '6.6.3'
-      CMAKE_GENERATOR: "Visual Studio 17 2022"
       CMAKE_SYSTEM_VERSION: "10.0.22621.0"
       WINDOWS_DEPS_VERSION: '2024-02-20'
     steps:
@@ -204,8 +211,6 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.target }}
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v2
       - name: Checkout obs
         uses: actions/checkout@v4.1.1
         with:
@@ -222,22 +227,26 @@ jobs:
       - name: Fetch Git Tags
         run: git fetch --prune --tags --unshallow
       - name: 'Install prerequisite: QT'
+        shell: pwsh
         run: |
-          curl -LO https://github.com/obsproject/obs-deps/releases/download/${{ env.WINDOWS_DEPS_VERSION }}/windows-deps-qt6-${{ env.WINDOWS_DEPS_VERSION }}-${{ matrix.target }}.zip -f --retry 5 -C -
-          7z x windows-deps-qt6-${{ env.WINDOWS_DEPS_VERSION }}-${{ matrix.target }}.zip -o"${{ github.workspace }}/cmbuild/deps/qt6"
+          curl.exe -LO "https://github.com/obsproject/obs-deps/releases/download/${{ env.WINDOWS_DEPS_VERSION }}/windows-deps-qt6-${{ env.WINDOWS_DEPS_VERSION }}-${{ matrix.target }}.zip" -f --retry 5
+          New-Item -ItemType Directory -Force -Path "${{ github.workspace }}/cmbuild/deps/qt6"
+          tar.exe -xf "windows-deps-qt6-${{ env.WINDOWS_DEPS_VERSION }}-${{ matrix.target }}.zip" -C "${{ github.workspace }}/cmbuild/deps/qt6"
       - name: 'Install prerequisite: Pre-built dependencies'
+        shell: pwsh
         run: |
-          curl -LO https://github.com/obsproject/obs-deps/releases/download/${{ env.WINDOWS_DEPS_VERSION }}/windows-deps-${{ env.WINDOWS_DEPS_VERSION }}-${{ matrix.target }}.zip -f --retry 5 -C -
-          7z x windows-deps-${{ env.WINDOWS_DEPS_VERSION }}-${{ matrix.target }}.zip -o"${{ github.workspace }}/cmbuild/deps"
+          curl.exe -LO "https://github.com/obsproject/obs-deps/releases/download/${{ env.WINDOWS_DEPS_VERSION }}/windows-deps-${{ env.WINDOWS_DEPS_VERSION }}-${{ matrix.target }}.zip" -f --retry 5
+          New-Item -ItemType Directory -Force -Path "${{ github.workspace }}/cmbuild/deps"
+          tar.exe -xf "windows-deps-${{ env.WINDOWS_DEPS_VERSION }}-${{ matrix.target }}.zip" -C "${{ github.workspace }}/cmbuild/deps"
       - name: Configure
         run: |
           mkdir ./package
           mkdir ./installer
           mkdir ./installer/media
           mkdir ./build
-          cmake -S . -B "${{ github.workspace }}/build" -G "${{ env.CMAKE_GENERATOR }}" -A "${{ matrix.cmake_build }}" -DCMAKE_PREFIX_PATH:PATH="${{ github.workspace }}/cmbuild/deps" -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" -DBUILD_BROWSER=OFF -DBUILD_VST=OFF -DBUILD_VIRTUALCAM=OFF -DBUILD_CAPTIONS=OFF -DCOMPILE_D3D12_HOOK=OFF -DENABLE_SCRIPTING=OFF -DENABLE_WEBSOCKET=OFF -DENABLE_AJA=OFF -DENABLE_DECKLINK=OFF -DENABLE_VLC=OFF -DENABLE_PLUGINS=ON -DDISABLE_PLUGINS=OFF -DDepsPath="${{ github.workspace }}/cmbuild/deps" -DDepsPath${{ matrix.deps_ext }}="${{ github.workspace }}/cmbuild/deps" -DQTDIR="${{ github.workspace }}/cmbuild/deps/qt6"
+          cmake -S . -B "${{ github.workspace }}/build" -A "${{ matrix.cmake_build }}" -DCMAKE_PREFIX_PATH:PATH="${{ github.workspace }}/cmbuild/deps" -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" -DCMAKE_CXX_FLAGS="/EHsc -D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS -D_SILENCE_ALL_MS_EXT_DEPRECATION_WARNINGS" -DENABLE_WINRT=OFF -DENABLE_UI=OFF -DENABLE_FRONTEND_API=OFF -DBUILD_BROWSER=OFF -DBUILD_VST=OFF -DBUILD_VIRTUALCAM=OFF -DBUILD_CAPTIONS=OFF -DCOMPILE_D3D12_HOOK=OFF -DENABLE_SCRIPTING=OFF -DENABLE_WEBSOCKET=OFF -DENABLE_AJA=OFF -DENABLE_DECKLINK=OFF -DENABLE_VLC=OFF -DENABLE_PLUGINS=ON -DDISABLE_PLUGINS=OFF -DDepsPath="${{ github.workspace }}/cmbuild/deps" -DDepsPath${{ matrix.deps_ext }}="${{ github.workspace }}/cmbuild/deps" -DQTDIR="${{ github.workspace }}/cmbuild/deps/qt6"
       - name: 'Build'
-        run: msbuild /m /p:Configuration=RelWithDebInfo .\build\obs-studio.sln
+        run: cmake --build "${{ github.workspace }}/build" --config RelWithDebInfo --target ${{ env.PLUGIN_NAME }} --parallel
       - name: Package
         if: success()
         shell: pwsh
@@ -268,7 +277,7 @@ jobs:
           path: installer/*
   windows-package:
     name: 'Windows Package'
-    runs-on: windows-2022
+    runs-on: windows-2025
     needs: [windows-build]
     steps:
       - name: Checkout
