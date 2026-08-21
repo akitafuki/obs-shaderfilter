@@ -1,6 +1,6 @@
 # obs-shaderfilter
 
-[![OBS Studio](https://img.shields.io/badge/OBS%20Studio-30.0%2B-blue.svg)](https://obsproject.com/)
+[![OBS Studio](https://img.shields.io/badge/OBS%20Studio-32.0%2B-blue.svg)](https://obsproject.com/)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)](https://github.com/akitafuki/obs-shaderfilter)
 [![License](https://img.shields.io/badge/license-GPL--2.0-green.svg)](LICENSE)
 [![Shaders](https://img.shields.io/badge/bundled%20shaders-170%2B-orange.svg)](data/examples)
@@ -223,9 +223,9 @@ python3 scripts/validate_shaders.py
 
 ## 📜 Credits & Acknowledgments
 
-* **Original Plugin Creator**: [Charles Fettinger](https://github.com/CharlesFettinger)
+* **Original Plugin Creator**: [Charles Fettinger](https://github.com/Oncorporation)
 * **Legacy Upgrades & Shaders**: [Exeldro](https://github.com/exeldro)
-* **Modernized Fork & Enhancements**: Maintained by [akitafuki](https://github.com/akitafuki/obs-shaderfilter) with modular multi-file architecture, OBS 30+ support, HDR pipeline, live hot-reloading, multi-pass ping-pong rendering, and automated shader test suites.
+* **Modernized Fork & Enhancements**: Maintained by [akitafuki](https://github.com/akitafuki/obs-shaderfilter) with modular multi-file architecture, OBS 30 – 32+ support, categorized shader browser, resolution downscaling, frame rate throttling, live hot-reloading, multi-pass ping-pong rendering, and automated shader test suites.
 
 ## 📄 License
 

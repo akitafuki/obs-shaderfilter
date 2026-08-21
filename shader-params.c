@@ -449,6 +449,287 @@ obs_missing_files_t *shader_filter_missing_files(void *data) {
   return files;
 }
 
+struct shader_category_entry {
+  const char *name;
+  const char *category;
+};
+
+static const struct shader_category_entry shader_category_table[] = {
+    /* Transitions */
+    {"3d_swap_transition", "transition"},
+    {"diffuse_transition", "transition"},
+    {"fade-transition", "transition"},
+    {"page-peel-transition", "transition"},
+    {"pixelation-transition", "transition"},
+    {"zoom_blur_transition", "transition"},
+
+    /* Audio Reactive */
+    {"audio", "audio"},
+    {"audio_neon_pulse", "audio"},
+    {"bent-camera", "audio"},
+    {"alpha-gaming-bent-camera", "audio"},
+    {"camera_shake", "audio"},
+    {"pulse", "audio"},
+    {"shake", "audio"},
+    {"seasick", "audio"},
+
+    /* Blurs & Glows */
+    {"anamorphic_streak", "blur"},
+    {"bloom", "blur"},
+    {"box-blur", "blur"},
+    {"frosted_glass", "blur"},
+    {"gaussian-blur-advanced", "blur"},
+    {"gaussian-blur-simple", "blur"},
+    {"gaussian-blur", "blur"},
+    {"gaussian-example", "blur"},
+    {"gaussian-simple", "blur"},
+    {"glow", "blur"},
+    {"motion_blur", "blur"},
+    {"shine", "blur"},
+    {"specular-shine", "blur"},
+    {"tilt_shift", "blur"},
+    {"zoom_blur", "blur"},
+
+    /* Retro, CRT & Glitch */
+    {"VCR", "retro"},
+    {"VHS", "retro"},
+    {"ascii", "retro"},
+    {"cell_shaded", "retro"},
+    {"cartoon", "retro"},
+    {"chromatic-aberration", "retro"},
+    {"crt-curvature", "retro"},
+    {"cyberpunk_hologram", "retro"},
+    {"digital-rain", "retro"},
+    {"doodle", "retro"},
+    {"drawings", "retro"},
+    {"edge_detection", "retro"},
+    {"emboss", "retro"},
+    {"emboss_color", "retro"},
+    {"gameboy", "retro"},
+    {"gb-camera", "retro"},
+    {"glitch-periodic", "retro"},
+    {"glitch", "retro"},
+    {"glitch_analog", "retro"},
+    {"halftone", "retro"},
+    {"matrix", "retro"},
+    {"pixelation", "retro"},
+    {"scan_line", "retro"},
+    {"thermal", "retro"},
+    {"tv-crt-subpixel", "retro"},
+    {"voronoi-pixelation", "retro"},
+
+    /* Borders, Shapes & Masks */
+    {"alpha_border", "border"},
+    {"aspect_ratio", "border"},
+    {"background_removal", "border"},
+    {"border", "border"},
+    {"circle-mask-filter", "border"},
+    {"circle", "border"},
+    {"cut_rect_per_corner", "border"},
+    {"drop_shadow", "border"},
+    {"dynamic-mask", "border"},
+    {"hexagon", "border"},
+    {"pie-chart", "border"},
+    {"rectangular_drop_shadow", "border"},
+    {"remove_partial_pixels", "border"},
+    {"rounded_rect", "border"},
+    {"rounded_rect2", "border"},
+    {"rounded_rect_per_corner", "border"},
+    {"rounded_rect_per_side", "border"},
+    {"rounded_stroke", "border"},
+    {"rounded_stroke_gradient", "border"},
+    {"spotlight", "border"},
+    {"two-pass-drop-shadow", "border"},
+
+    /* Distortions & Warps */
+    {"3d-panel", "distort"},
+    {"BulgePinch", "distort"},
+    {"Chroma+UV-Distortion", "distort"},
+    {"Swirl", "distort"},
+    {"ZigZag", "distort"},
+    {"corner-pin", "distort"},
+    {"corner_pin", "distort"},
+    {"curve", "distort"},
+    {"cylinder", "distort"},
+    {"displacement_map", "distort"},
+    {"displacement_map_advanced", "distort"},
+    {"displacement_map_advanced_invert", "distort"},
+    {"displacement_map_invert", "distort"},
+    {"divide_rotate", "distort"},
+    {"drunk", "distort"},
+    {"fisheye-xy", "distort"},
+    {"fisheye", "distort"},
+    {"flip", "distort"},
+    {"heat-wave-simple", "distort"},
+    {"normal_map", "distort"},
+    {"page-peel", "distort"},
+    {"perspective", "distort"},
+    {"polar", "distort"},
+    {"quadrilateral_crop", "distort"},
+    {"repeat", "distort"},
+    {"repeat_grid_center_crop", "distort"},
+    {"repeat_texture", "distort"},
+    {"ripple", "distort"},
+    {"rotating-source", "distort"},
+    {"rotatoe", "distort"},
+    {"twist", "distort"},
+    {"zoom", "distort"},
+
+    /* Color & Tonemapping */
+    {"Add", "color"},
+    {"Invert", "color"},
+    {"Luminance", "color"},
+    {"luminance2", "color"},
+    {"luminance_alpha", "color"},
+    {"bt601tobt709", "color"},
+    {"bt709tobt601", "color"},
+    {"color-depth", "color"},
+    {"color_grade_filter", "color"},
+    {"darken", "color"},
+    {"density_sat_hue", "color"},
+    {"fill_color_gradient", "color"},
+    {"fill_color_linear", "color"},
+    {"fill_color_radial_degrees", "color"},
+    {"fill_color_radial_percentage", "color"},
+    {"filmic_aces", "color"},
+    {"gamma_correction", "color"},
+    {"gradient", "color"},
+    {"hsl_hsv_saturation", "color"},
+    {"hue-rotaton", "color"},
+    {"invert-luma", "color"},
+    {"multiply", "color"},
+    {"opacity", "color"},
+    {"blend_opacity", "color"},
+    {"rainbow", "color"},
+    {"rgb_color_wheel", "color"},
+    {"rgb_split", "color"},
+    {"rgbvisibility", "color"},
+    {"selective_color", "color"},
+    {"simple_gradient", "color"},
+    {"vignetting", "color"},
+
+    /* Generative & FX */
+    {"animated_path", "generative"},
+    {"animated_texture", "generative"},
+    {"blink", "generative"},
+    {"burn", "generative"},
+    {"clock_analog", "generative"},
+    {"clock_digital_led", "generative"},
+    {"clock_digital_nixie", "generative"},
+    {"cube_rotating", "generative"},
+    {"embers", "generative"},
+    {"fire-3", "generative"},
+    {"fire", "generative"},
+    {"fireworks", "generative"},
+    {"fireworks2", "generative"},
+    {"glass", "generative"},
+    {"hard_blink", "generative"},
+    {"night_sky", "generative"},
+    {"noise", "generative"},
+    {"perlin_noise", "generative"},
+    {"rain-window", "generative"},
+    {"seascape", "generative"},
+    {"simplex_noise", "generative"},
+    {"smart_denoise", "generative"},
+    {"tetra", "generative"},
+    {"dead-pixel-fixer", "generative"},
+    {"walking-dead-pixel-fixer", "generative"},
+    {"intensity-scope", "generative"},
+    {"obs", "generative"},
+    {"RGSSAA", "generative"},
+    {"filter_template", "generative"},
+    {NULL, NULL}};
+
+static const char *get_shader_category(const char *filename) {
+  if (!filename)
+    return "generative";
+
+  const char *slash = strrchr(filename, '/');
+  if (!slash)
+    slash = strrchr(filename, '\\');
+  const char *base = slash ? slash + 1 : filename;
+
+  for (size_t i = 0; shader_category_table[i].name != NULL; i++) {
+    size_t len = strlen(shader_category_table[i].name);
+    if (strncmp(base, shader_category_table[i].name, len) == 0) {
+      char next_char = base[len];
+      if (next_char == '.' || next_char == '\0' || next_char == '_')
+        return shader_category_table[i].category;
+    }
+  }
+
+  if (astrstri(base, "transition"))
+    return "transition";
+  if (astrstri(base, "audio") || astrstri(base, "beat") || astrstri(base, "pulse") || astrstri(base, "shake"))
+    return "audio";
+  if (astrstri(base, "blur") || astrstri(base, "glow") || astrstri(base, "shine") || astrstri(base, "bloom"))
+    return "blur";
+  if (astrstri(base, "color") || astrstri(base, "lut") || astrstri(base, "grade") || astrstri(base, "invert") ||
+      astrstri(base, "gradient") || astrstri(base, "gamma"))
+    return "color";
+  if (astrstri(base, "distort") || astrstri(base, "warp") || astrstri(base, "fisheye") || astrstri(base, "pinch") ||
+      astrstri(base, "swirl") || astrstri(base, "wave") || astrstri(base, "ripple"))
+    return "distort";
+  if (astrstri(base, "crt") || astrstri(base, "retro") || astrstri(base, "vhs") || astrstri(base, "glitch") ||
+      astrstri(base, "dither") || astrstri(base, "pixel") || astrstri(base, "ascii"))
+    return "retro";
+  if (astrstri(base, "border") || astrstri(base, "mask") || astrstri(base, "corner") || astrstri(base, "crop") ||
+      astrstri(base, "shadow") || astrstri(base, "stroke") || astrstri(base, "rect") || astrstri(base, "circle"))
+    return "border";
+
+  return "generative";
+}
+
+static void populate_preset_list(obs_property_t *preset_list, const char *category_filter) {
+  if (!preset_list)
+    return;
+
+  obs_property_list_clear(preset_list);
+  obs_property_list_add_string(preset_list, obs_module_text("ShaderFilter.PresetNone"), "");
+
+  struct dstr examples_path = {0};
+  dstr_init(&examples_path);
+  dstr_cat(&examples_path, obs_get_module_data_path(obs_current_module()));
+  dstr_cat(&examples_path, "/examples");
+
+  struct dstr glob_pattern = {0};
+  dstr_copy_dstr(&glob_pattern, &examples_path);
+  dstr_cat(&glob_pattern, "/*");
+
+  bool show_all = (!category_filter || strcmp(category_filter, "all") == 0 || !*category_filter);
+
+  os_glob_t *glob_info = NULL;
+  if (os_glob(glob_pattern.array, 0, &glob_info) == 0 && glob_info) {
+    for (size_t i = 0; i < glob_info->gl_pathc; i++) {
+      const char *path = glob_info->gl_pathv[i].path;
+      if (strstr(path, ".shader") || strstr(path, ".effect")) {
+        const char *filename = strrchr(path, '/');
+        if (!filename)
+          filename = strrchr(path, '\\');
+        filename = filename ? filename + 1 : path;
+
+        const char *cat = get_shader_category(filename);
+        if (show_all || (cat && strcmp(cat, category_filter) == 0)) {
+          obs_property_list_add_string(preset_list, filename, path);
+        }
+      }
+    }
+    os_globfree(glob_info);
+  }
+  dstr_free(&glob_pattern);
+  dstr_free(&examples_path);
+}
+
+static bool shader_filter_category_changed(obs_properties_t *props, obs_property_t *p, obs_data_t *settings) {
+  UNUSED_PARAMETER(p);
+  const char *cat = obs_data_get_string(settings, "preset_category");
+  obs_property_t *preset_list = obs_properties_get(props, "preset_shader");
+  if (preset_list) {
+    populate_preset_list(preset_list, cat);
+  }
+  return true;
+}
+
 static bool shader_filter_preset_changed(obs_properties_t *props, obs_property_t *p, obs_data_t *settings) {
   const char *preset_path = obs_data_get_string(settings, "preset_shader");
   if (!preset_path || !*preset_path)
@@ -479,29 +760,28 @@ obs_properties_t *shader_filter_properties(void *data) {
   obs_properties_t *props = obs_properties_create();
   obs_properties_set_param(props, filter, NULL);
 
+  obs_property_t *cat_list = obs_properties_add_list(props, "preset_category", obs_module_text("ShaderFilter.PresetCategory"),
+                                                     OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_STRING);
+  obs_property_list_add_string(cat_list, obs_module_text("ShaderFilter.Category.All"), "all");
+  obs_property_list_add_string(cat_list, obs_module_text("ShaderFilter.Category.Audio"), "audio");
+  obs_property_list_add_string(cat_list, obs_module_text("ShaderFilter.Category.Blur"), "blur");
+  obs_property_list_add_string(cat_list, obs_module_text("ShaderFilter.Category.Color"), "color");
+  obs_property_list_add_string(cat_list, obs_module_text("ShaderFilter.Category.Distort"), "distort");
+  obs_property_list_add_string(cat_list, obs_module_text("ShaderFilter.Category.Retro"), "retro");
+  obs_property_list_add_string(cat_list, obs_module_text("ShaderFilter.Category.Border"), "border");
+  obs_property_list_add_string(cat_list, obs_module_text("ShaderFilter.Category.Generative"), "generative");
+  obs_property_list_add_string(cat_list, obs_module_text("ShaderFilter.Category.Transition"), "transition");
+  obs_property_set_modified_callback(cat_list, shader_filter_category_changed);
+
   obs_property_t *preset_list = obs_properties_add_list(props, "preset_shader", obs_module_text("ShaderFilter.Preset"),
                                                         OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_STRING);
-  obs_property_list_add_string(preset_list, obs_module_text("ShaderFilter.PresetNone"), "");
 
-  struct dstr glob_pattern = {0};
-  dstr_copy_dstr(&glob_pattern, &examples_path);
-  dstr_cat(&glob_pattern, "/*");
+  obs_data_t *settings = filter ? obs_source_get_settings(filter->context) : NULL;
+  const char *current_cat = settings ? obs_data_get_string(settings, "preset_category") : "all";
+  populate_preset_list(preset_list, current_cat);
+  if (settings)
+    obs_data_release(settings);
 
-  os_glob_t *glob_info = NULL;
-  if (os_glob(glob_pattern.array, 0, &glob_info) == 0 && glob_info) {
-    for (size_t i = 0; i < glob_info->gl_pathc; i++) {
-      const char *path = glob_info->gl_pathv[i].path;
-      if (strstr(path, ".shader") || strstr(path, ".effect")) {
-        const char *filename = strrchr(path, '/');
-        if (!filename)
-          filename = strrchr(path, '\\');
-        filename = filename ? filename + 1 : path;
-        obs_property_list_add_string(preset_list, filename, path);
-      }
-    }
-    os_globfree(glob_info);
-  }
-  dstr_free(&glob_pattern);
   obs_property_set_modified_callback(preset_list, shader_filter_preset_changed);
 
   if (!filter || !filter->transition) {

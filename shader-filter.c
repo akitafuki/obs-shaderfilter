@@ -732,6 +732,7 @@ static uint32_t shader_filter_getheight(void *data) {
 }
 
 static void shader_filter_defaults(obs_data_t *settings) {
+  obs_data_set_default_string(settings, "preset_category", "all");
   obs_data_set_default_string(settings, "shader_text", effect_template_default_image_shader);
   obs_data_set_default_bool(settings, "auto_reload", false);
   obs_data_set_default_double(settings, "render_scale", 100.0);
